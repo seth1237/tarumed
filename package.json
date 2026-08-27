@@ -9,7 +9,7 @@
     "start:prod": "NODE_ENV=production next start"
   },
   "engines": {
-    "node": ">=20"
+    "node": "20.x"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

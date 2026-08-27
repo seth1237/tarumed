@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  // Standalone is for Docker/VPS. On Vercel it skips NFT traces and the
+  // platform build fails with ENOENT next-server.js.nft.json.
+  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
   poweredByHeader: false,
   compress: true,
   typescript: {
