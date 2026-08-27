@@ -10,7 +10,7 @@ export const COMPANY = {
   shortName: 'Tarumed',
   tagline: 'Discover More. Live Healthier',
   domain: 'tarumed.co.ke',
-  url: 'https://tarumed.co.ke',
+  url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://tarumed.co.ke').replace(/\/$/, ''),
   email: 'hello@tarumed.co.ke',
   careersEmail: 'careers@tarumed.co.ke',
   phone: '+254 715 084 078',
