@@ -133,7 +133,11 @@ async function getDatabase(): Promise<Db> {
   if (!uri) throw new Error('MONGODB_URI is not configured')
 
   if (!state.client) {
-    state.client = new MongoClient(uri)
+    const isDev = process.env.NODE_ENV !== 'production'
+    state.client = new MongoClient(uri, {
+      serverSelectionTimeoutMS: isDev ? 2500 : 8000,
+      connectTimeoutMS: isDev ? 2500 : 8000,
+    })
     await state.client.connect()
   }
 

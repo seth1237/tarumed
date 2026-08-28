@@ -1,8 +1,10 @@
+const isProdBuild = process.env.NODE_ENV === 'production' && !process.env.VERCEL
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Standalone is for Docker/VPS. On Vercel it skips NFT traces and the
-  // platform build fails with ENOENT next-server.js.nft.json.
-  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
+  // Standalone is for Docker/VPS production builds only. Skip it in `next dev`
+  // and on Vercel (Vercel needs NFT traces such as next-server.js.nft.json).
+  ...(isProdBuild ? { output: 'standalone' } : {}),
   poweredByHeader: false,
   compress: true,
   typescript: {

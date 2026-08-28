@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { cache } from 'react'
+import { lastCatalog, readDevCatalogCache, writeDevCatalogCache } from '@/lib/catalog-cache'
 import { getERPCategories, getERPProductById, getERPProducts, type ERPCategory, type ERPProduct } from '@/lib/erp'
 import { assignSlugs, mergeProduct, slugifyName, type Catalog, type CatalogProduct } from '@/lib/catalog'
 import { getProductMetricsMap, getProductContentMap, getRelatedProductIds, getSiteSettings, type ProductContent } from '@/lib/mongodb'
@@ -37,14 +38,26 @@ export async function getCatalog(categoryIds?: string[]): Promise<Catalog> {
     getProductMetricsMap().catch(() => new Map()),
   ])
 
-  const products = base.products
-    .map((product) => {
-      const stats = metrics.get(product.id)
-      return { ...product, clicks: stats?.clicks || 0, shares: stats?.shares || 0 }
-    })
-    .sort((a, b) => b.clicks - a.clicks || a.name.localeCompare(b.name))
+  const catalog: Catalog = {
+    products: base.products
+      .map((product) => {
+        const stats = metrics.get(product.id)
+        return { ...product, clicks: stats?.clicks || 0, shares: stats?.shares || 0 }
+      })
+      .sort((a, b) => b.clicks - a.clicks || a.name.localeCompare(b.name)),
+    categories: base.categories,
+  }
 
-  return { products, categories: base.categories }
+  if (catalog.products.length) {
+    if (!categoryIds?.length) await writeDevCatalogCache(catalog)
+    return catalog
+  }
+
+  if (categoryIds?.length) return catalog
+
+  const cached = lastCatalog() || (await readDevCatalogCache())
+  if (cached?.products.length) return cached
+  return catalog
 }
 
 export async function getCatalogProduct(idOrSlug: string): Promise<CatalogProduct | null> {
@@ -56,7 +69,7 @@ export async function getCatalogProduct(idOrSlug: string): Promise<CatalogProduc
   if (match) return match
 
   const [product, content, metrics] = await Promise.all([
-    getERPProductById(key),
+    getERPProductById(key).catch(() => null),
     getProductContentMap().catch(() => new Map<string, ProductContent>()),
     getProductMetricsMap().catch(() => new Map()),
   ])

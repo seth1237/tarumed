@@ -18,7 +18,7 @@ export function ProductCard({
       <div className="product-info">
         <span className="product-category">{product.categoryName}</span>
         <h3>{product.name}</h3>
-        <div className="flex items-center justify-between gap-3">
+        <div className="product-cta">
           <strong className={showPrice ? '' : 'price-hidden'}>
             {showPrice ? formatKes(product.price) : 'Request a quote'}
           </strong>

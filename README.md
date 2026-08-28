@@ -10,6 +10,10 @@ npm install
 npm run dev
 ```
 
+Open [http://localhost:3000](http://localhost:3000). `.env.development` keeps the site URL on localhost even if a production `.env` is present.
+
+The homepage loads from the ERP. If that API is slow or down, requests time out after a few seconds and the last successful catalogue is reused from `.cache/` so local work can continue.
+
 ## Deploy
 
 Required environment variables are listed in `.env.example`. For this project the filled production file is `.env` (not committed).

@@ -51,7 +51,13 @@ export function CatalogBrowser({
           <ProductCard key={product.id} product={product} showPrice={showPrices} />
         ))}
       </div>
-      {visible.length === 0 && <p className="empty-state">No products match this search.</p>}
+      {visible.length === 0 && (
+        <p className="empty-state">
+          {catalog.products.length === 0 && !query
+            ? 'Live inventory is unavailable right now. Check that the ERP is reachable, then refresh.'
+            : 'No products match this search.'}
+        </p>
+      )}
       {filtered.length > 0 && (
         <div className="catalog-more">
           {currentPage > 1 && (

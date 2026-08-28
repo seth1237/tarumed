@@ -15,4 +15,5 @@ atlas-credentials.env
 # Common ignores
 node_modules
 .next/
+.cache/
 .DS_Store

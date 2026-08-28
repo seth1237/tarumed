@@ -21,7 +21,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
         <span className="kicker">Category</span>
         <h1 className="page-title">{category.name}</h1>
         <p className="hero-lede">{category.description || 'Products in this ERP category.'} · {products.length} items</p>
-        <div className="mt-10">
+        <div className="catalog-body">
           <Suspense>
             <CatalogBrowser
               catalog={{ ...catalog, products, categories: [{ ...category, count: products.length }] }}

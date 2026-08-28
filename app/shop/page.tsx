@@ -20,7 +20,7 @@ export default async function Shop({ searchParams }: { searchParams: Promise<{ q
         <span className="kicker">ERP catalogue · Live inventory</span>
         <h1 className="page-title">All <em>products.</em></h1>
         <p className="hero-lede">Browse medical equipment and supplies currently listed in the Tarumed ERP.</p>
-        <div className="mt-10">
+        <div className="catalog-body">
           <Suspense>
             <CatalogBrowser catalog={catalog} showPrices={showPrices} initialQuery={params.q || ''} />
           </Suspense>
