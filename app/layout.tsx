@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { COMPANY } from '@/lib/utils'
+import { AppProviders } from '@/components/app-providers'
 
 export const metadata: Metadata = {
   metadataBase: new URL(COMPANY.url),
@@ -53,8 +54,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className="bg-background">
       <body className="antialiased">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        <AppProviders>
+          {children}
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+        </AppProviders>
       </body>
     </html>
   )

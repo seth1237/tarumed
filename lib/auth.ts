@@ -45,11 +45,16 @@ function verifySignedValue(token: string) {
 
 export async function ensureSeedAdmin() {
   if (!isMongoConfigured()) return
-  const email = (process.env.ADMIN_EMAIL || 'admin@tarumed.co.ke').trim().toLowerCase()
+  const email = (process.env.ADMIN_EMAIL || 'info@tarumed.co.ke').trim().toLowerCase()
   const existing = await getAdminByEmail(email)
   if (!existing) {
-    const legacy = await getAdminByEmail('admin@tarumed.com')
-    if (legacy) await updateAdminEmail('admin@tarumed.com', email)
+    for (const legacyEmail of ['admin@tarumed.co.ke', 'admin@tarumed.com']) {
+      const legacy = await getAdminByEmail(legacyEmail)
+      if (legacy) {
+        await updateAdminEmail(legacyEmail, email)
+        break
+      }
+    }
   }
   const count = await countAdmins()
   if (count > 0) return

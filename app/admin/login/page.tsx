@@ -37,7 +37,7 @@ export default function AdminLoginPage() {
       <form className="login-card" onSubmit={onSubmit}>
         <Logo />
         <h1>Admin sign in</h1>
-        <label>Email<input name="email" type="email" required autoComplete="username" defaultValue="admin@tarumed.co.ke" /></label>
+        <label>Email<input name="email" type="email" required autoComplete="username" defaultValue="info@tarumed.co.ke" /></label>
         <label>Password<input name="password" type="password" required autoComplete="current-password" /></label>
         {error && <p className="form-error">{error}</p>}
         <button className="button button-primary" disabled={sending}>{sending ? 'Signing in…' : 'Sign in'}</button>

@@ -1,5 +1,6 @@
 import 'server-only'
-import { MongoClient, type Collection, type Db } from 'mongodb'
+import { MongoClient, ObjectId, type Collection, type Db } from 'mongodb'
+import type { JobImage, JobPost } from '@/lib/jobs'
 
 type MongoState = {
   client: MongoClient | null
@@ -7,7 +8,7 @@ type MongoState = {
   indexVersion: number
 }
 
-const MONGO_INDEX_VERSION = 2
+const MONGO_INDEX_VERSION = 3
 
 const globalForMongo = globalThis as typeof globalThis & { __tarumedMongo?: MongoState }
 
@@ -85,6 +86,8 @@ export type ContactMessage = {
   message: string
   createdAt: Date
 }
+
+export type { JobImage, JobPost } from '@/lib/jobs'
 
 export type ProductPerformance = {
   _id?: string
@@ -164,6 +167,8 @@ export async function ensureIndexes(): Promise<void> {
   await db.collection('product_performance').createIndex({ lastClickedAt: -1 })
   await db.collection('product_journeys').createIndex({ fromProductId: 1, toProductId: 1 }, { unique: true })
   await db.collection('product_journeys').createIndex({ fromProductId: 1, count: -1 })
+  await db.collection('jobs').createIndex({ slug: 1 }, { unique: true })
+  await db.collection('jobs').createIndex({ published: 1, createdAt: -1 })
   state.indexVersion = MONGO_INDEX_VERSION
 }
 
@@ -417,4 +422,151 @@ export async function getCategoryPerformance(): Promise<CategoryPerformance[]> {
       { $sort: { clicks: -1 } },
     ]).toArray()
   })
+}
+
+type JobDoc = Omit<JobPost, '_id' | 'createdAt' | 'updatedAt'> & {
+  _id?: ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
+
+function serializeJob(doc: JobDoc & { _id: ObjectId }): JobPost {
+  return {
+    _id: String(doc._id),
+    title: doc.title,
+    slug: doc.slug,
+    location: doc.location,
+    employmentType: doc.employmentType,
+    department: doc.department || '',
+    summary: doc.summary,
+    description: doc.description,
+    requirements: doc.requirements || '',
+    applyEmail: doc.applyEmail || '',
+    image: doc.image || null,
+    published: Boolean(doc.published),
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
+  }
+}
+
+async function uniqueJobSlug(base: string, excludeId?: string) {
+  const collection = await getCollection<JobDoc>('jobs')
+  const root = base || 'role'
+  let slug = root
+  let n = 2
+  while (true) {
+    const existing = await collection.findOne({ slug })
+    if (!existing || (excludeId && String(existing._id) === excludeId)) return slug
+    slug = `${root}-${n}`
+    n += 1
+  }
+}
+
+export async function listJobs(publishedOnly = false): Promise<JobPost[]> {
+  if (!isMongoConfigured()) return []
+  return withMongo(async () => {
+    await ensureIndexes()
+    const collection = await getCollection<JobDoc>('jobs')
+    const filter = publishedOnly ? { published: true } : {}
+    const docs = await collection.find(filter).sort({ createdAt: -1 }).toArray()
+    return docs.map((doc) => serializeJob(doc as JobDoc & { _id: ObjectId }))
+  })
+}
+
+export async function getJobBySlug(slug: string): Promise<JobPost | null> {
+  if (!isMongoConfigured() || !slug) return null
+  return withMongo(async () => {
+    await ensureIndexes()
+    const collection = await getCollection<JobDoc>('jobs')
+    const doc = await collection.findOne({ slug })
+    return doc ? serializeJob(doc as JobDoc & { _id: ObjectId }) : null
+  })
+}
+
+export async function getJobById(id: string): Promise<JobPost | null> {
+  if (!isMongoConfigured() || !ObjectId.isValid(id)) return null
+  return withMongo(async () => {
+    await ensureIndexes()
+    const collection = await getCollection<JobDoc>('jobs')
+    const doc = await collection.findOne({ _id: new ObjectId(id) })
+    return doc ? serializeJob(doc as JobDoc & { _id: ObjectId }) : null
+  })
+}
+
+export async function createJob(input: {
+  title: string
+  slug: string
+  location: string
+  employmentType: string
+  department: string
+  summary: string
+  description: string
+  requirements: string
+  applyEmail: string
+  image?: JobImage | null
+  published: boolean
+}): Promise<JobPost> {
+  await ensureIndexes()
+  const collection = await getCollection<JobDoc>('jobs')
+  const now = new Date()
+  const slug = await uniqueJobSlug(input.slug)
+  const doc: JobDoc = {
+    title: input.title,
+    slug,
+    location: input.location,
+    employmentType: input.employmentType,
+    department: input.department,
+    summary: input.summary,
+    description: input.description,
+    requirements: input.requirements,
+    applyEmail: input.applyEmail,
+    image: input.image || null,
+    published: input.published,
+    createdAt: now,
+    updatedAt: now,
+  }
+  const result = await collection.insertOne(doc)
+  return serializeJob({ ...doc, _id: result.insertedId } as JobDoc & { _id: ObjectId })
+}
+
+export async function updateJob(id: string, input: Partial<{
+  title: string
+  slug: string
+  location: string
+  employmentType: string
+  department: string
+  summary: string
+  description: string
+  requirements: string
+  applyEmail: string
+  image: JobImage | null
+  published: boolean
+}>): Promise<JobPost | null> {
+  if (!ObjectId.isValid(id)) return null
+  await ensureIndexes()
+  const collection = await getCollection<JobDoc>('jobs')
+  const $set: Record<string, unknown> = { updatedAt: new Date() }
+  if (input.title !== undefined) $set.title = input.title
+  if (input.location !== undefined) $set.location = input.location
+  if (input.employmentType !== undefined) $set.employmentType = input.employmentType
+  if (input.department !== undefined) $set.department = input.department
+  if (input.summary !== undefined) $set.summary = input.summary
+  if (input.description !== undefined) $set.description = input.description
+  if (input.requirements !== undefined) $set.requirements = input.requirements
+  if (input.applyEmail !== undefined) $set.applyEmail = input.applyEmail
+  if (input.image !== undefined) $set.image = input.image
+  if (input.published !== undefined) $set.published = input.published
+  if (input.slug !== undefined) $set.slug = await uniqueJobSlug(input.slug, id)
+  await collection.updateOne({ _id: new ObjectId(id) }, { $set })
+  return getJobById(id)
+}
+
+export async function deleteJob(id: string): Promise<JobPost | null> {
+  if (!ObjectId.isValid(id)) return null
+  await ensureIndexes()
+  const collection = await getCollection<JobDoc>('jobs')
+  const existing = await collection.findOne({ _id: new ObjectId(id) })
+  if (!existing) return null
+  await collection.deleteOne({ _id: new ObjectId(id) })
+  return serializeJob(existing as JobDoc & { _id: ObjectId })
 }

@@ -61,7 +61,6 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             <h1 className="page-title">{product.name}</h1>
             <p className="hero-lede product-details">{product.description || 'Professional medical supply from the Tarumed ERP catalogue.'}</p>
             <p className="detail-price">{showPrices ? formatKes(product.price) : 'Request a quote'}</p>
-            <p className="detail-stock">{product.inStock ? `${product.stock} in stock` : 'Available on request'}</p>
             {product.manufacturer && <p className="text-muted-foreground">Manufacturer: {product.manufacturer}</p>}
             <QuoteForm product={product} />
           </div>

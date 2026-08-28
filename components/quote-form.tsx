@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { formatKes, type CatalogProduct } from '@/lib/catalog'
 import { COMPANY } from '@/lib/utils'
 import { ProductShare } from '@/components/product-share'
+import { useQuoteCart } from '@/components/quote-cart'
 
 function WhatsAppIcon() {
   return (
@@ -23,6 +25,8 @@ export function QuoteForm({ product }: { product: CatalogProduct }) {
   const [mode, setMode] = useState<'choose' | 'system'>('choose')
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const { add, has } = useQuoteCart()
+  const inCart = has(product.id)
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -68,11 +72,15 @@ export function QuoteForm({ product }: { product: CatalogProduct }) {
           <p>{product.name} · {product.categoryName}</p>
         </div>
         <div className="quote-options">
+          <button type="button" className={inCart ? 'button button-outline button-compact' : 'button button-primary button-compact'} onClick={() => add(product)}>
+            {inCart ? 'Added to quote cart' : 'Add to quote cart'}
+          </button>
+          <Link href="/quote" className="button button-outline button-compact">View quote cart</Link>
           <a className="wa-button" href={whatsappHref(product)} target="_blank" rel="noopener noreferrer">
             <WhatsAppIcon />
             Ask on WhatsApp
           </a>
-          <button type="button" className="button button-primary button-compact" onClick={() => setMode('system')}>
+          <button type="button" className="button button-outline button-compact" onClick={() => setMode('system')}>
             Request from the system
           </button>
           <ProductShare product={product} />

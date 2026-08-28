@@ -75,10 +75,20 @@
 .login-card p { color: #9db9b7; font-size: 14px; }
 .login-card label { color: #cfe3e1; }
 .login-card input { background: #121821; border-color: #2a3548; color: #fff; }
+.admin-job-form { display: grid; gap: 12px; }
+.admin-job-form label { display: grid; gap: 6px; font-size: 12px; font-weight: 700; color: #123744; }
+.admin-job-form input, .admin-job-form textarea, .admin-job-form select { border: 1px solid #dbe7e5; border-radius: 8px; padding: 10px 12px; font: inherit; font-weight: 400; background: #fff; }
+.admin-job-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.admin-job-preview { display: flex; gap: 12px; align-items: center; }
+.admin-job-preview img { width: 96px; height: 72px; object-fit: cover; border-radius: 8px; background: #eef3f2; }
+.admin-check { display: flex !important; flex-direction: row !important; align-items: center; gap: 8px; font-weight: 600; }
+.admin-job-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.admin-job-placeholder { width: 64px; height: 64px; border-radius: 8px; background: #e8eef2; display: block; }
 @media (max-width: 800px) {
   .admin-shell { display: block; }
   .admin-sidebar { width: auto; height: auto; position: static; }
   .admin-main { padding: 28px 18px; }
   .admin-stats { grid-template-columns: 1fr 1fr; }
   .admin-product { grid-template-columns: 64px 1fr auto; }
+  .admin-job-row { grid-template-columns: 1fr; }
 }

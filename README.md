@@ -40,4 +40,4 @@ npm run start
 ## Admin
 
 - URL: `https://tarumed.co.ke/admin/login`
-- Email: `admin@tarumed.co.ke`
+- Email: `info@tarumed.co.ke`

@@ -29,6 +29,13 @@ export type Catalog = {
 
 export type NavProduct = { id: string; name: string; slug: string }
 
+export type SearchProduct = {
+  id: string
+  name: string
+  slug: string
+  categoryName: string
+}
+
 export type NavCategory = {
   id: string
   name: string
@@ -83,7 +90,7 @@ export function mergeProduct(product: ERPProduct, content?: {
     price: Number(product.sellingPrice || 0),
     unit: product.unit || 'unit',
     stock,
-    inStock: stock > 0,
+    inStock: true,
     image: images[0] || null,
     images,
     imageAssets: extraAssets,

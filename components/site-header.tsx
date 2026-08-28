@@ -4,5 +4,11 @@ import { buildNavCategories } from '@/lib/catalog'
 
 export async function SiteHeader() {
   const catalog = await getCatalog()
-  return <SiteHeaderNav categories={buildNavCategories(catalog)} />
+  const products = catalog.products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    categoryName: product.categoryName,
+  }))
+  return <SiteHeaderNav categories={buildNavCategories(catalog)} products={products} />
 }

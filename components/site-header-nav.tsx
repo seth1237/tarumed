@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { ChevronDown, Menu, Search, X } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { ChevronDown, Menu, ShoppingCart, X } from 'lucide-react'
 import { Logo } from '@/components/logo'
+import { SearchBox } from '@/components/search-box'
+import { useQuoteCart } from '@/components/quote-cart'
 import { COMPANY } from '@/lib/utils'
-import { productHref, type NavCategory } from '@/lib/catalog'
+import { productHref, type NavCategory, type SearchProduct } from '@/lib/catalog'
 
 const links = [
   { href: '/shop', label: 'Products' },
@@ -15,23 +17,21 @@ const links = [
   { href: '/contact', label: 'Contact' },
 ]
 
-export function SiteHeaderNav({ categories }: { categories: NavCategory[] }) {
+export function SiteHeaderNav({
+  categories,
+  products,
+}: {
+  categories: NavCategory[]
+  products: SearchProduct[]
+}) {
   const [open, setOpen] = useState(false)
   const [mobileCategory, setMobileCategory] = useState<string | null>(null)
-  const [query, setQuery] = useState('')
   const pathname = usePathname()
-  const router = useRouter()
+  const { count } = useQuoteCart()
 
   function closeMenu() {
     setOpen(false)
     setMobileCategory(null)
-  }
-
-  function onSearch(event: React.FormEvent) {
-    event.preventDefault()
-    const q = query.trim()
-    router.push(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop')
-    closeMenu()
   }
 
   return (
@@ -52,15 +52,11 @@ export function SiteHeaderNav({ categories }: { categories: NavCategory[] }) {
           ))}
         </nav>
         <div className="header-actions">
-          <form className="search" onSubmit={onSearch}>
-            <Search size={16} />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search products"
-              aria-label="Search products"
-            />
-          </form>
+          <SearchBox products={products} />
+          <Link href="/quote" className="cart-link" aria-label={`Quote cart, ${count} items`}>
+            <ShoppingCart size={18} />
+            {count > 0 && <span className="cart-count">{count}</span>}
+          </Link>
         </div>
         <button className="mobile-trigger" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
           {open ? <X /> : <Menu />}
@@ -102,6 +98,7 @@ export function SiteHeaderNav({ categories }: { categories: NavCategory[] }) {
           {links.map((link) => (
             <Link key={link.href} href={link.href} onClick={closeMenu}>{link.label}</Link>
           ))}
+          <Link href="/quote" onClick={closeMenu}>Quote cart{count > 0 ? ` (${count})` : ''}</Link>
           <div className="mobile-categories">
             <p>Categories</p>
             {categories.map((category) => {
@@ -133,15 +130,6 @@ export function SiteHeaderNav({ categories }: { categories: NavCategory[] }) {
               )
             })}
           </div>
-          <form className="search" onSubmit={onSearch}>
-            <Search size={16} />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search products"
-              aria-label="Search products"
-            />
-          </form>
         </div>
       )}
     </header>

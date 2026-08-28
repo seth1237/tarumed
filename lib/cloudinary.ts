@@ -33,15 +33,15 @@ export function configureCloudinary(): void {
   })
 }
 
-async function unsignedUpload(buffer: Buffer, erpProductId: string) {
+async function unsignedUpload(buffer: Buffer, folder: string, id: string) {
   const name = cloudName()
   const preset = uploadPreset()
   if (!name || !preset) throw new Error('Cloudinary unsigned upload is not configured')
   const body = new FormData()
   body.append('file', `data:image/jpeg;base64,${buffer.toString('base64')}`)
   body.append('upload_preset', preset)
-  body.append('folder', 'tarumed/products')
-  body.append('public_id', `${erpProductId}-${Date.now()}`)
+  body.append('folder', folder)
+  body.append('public_id', `${id}-${Date.now()}`)
   const response = await fetch(`https://api.cloudinary.com/v1_1/${name}/image/upload`, {
     method: 'POST',
     body,
@@ -53,7 +53,7 @@ async function unsignedUpload(buffer: Buffer, erpProductId: string) {
   return { public_id: result.public_id, secure_url: result.secure_url }
 }
 
-export async function uploadProductImage(buffer: Buffer, erpProductId: string) {
+export async function uploadSiteImage(buffer: Buffer, folder: string, id: string) {
   const config = getCloudinaryConfig()
   if (config.apiKey && config.apiSecret && config.cloudName) {
     configureCloudinary()
@@ -62,10 +62,10 @@ export async function uploadProductImage(buffer: Buffer, erpProductId: string) {
         .upload_stream(
           {
             resource_type: 'image',
-            folder: 'tarumed/products',
-            public_id: `${erpProductId}-${Date.now()}`,
+            folder,
+            public_id: `${id}-${Date.now()}`,
             overwrite: false,
-            transformation: [{ width: 1200, height: 1200, crop: 'limit' }, { quality: 'auto' }, { fetch_format: 'auto' }],
+            transformation: [{ width: 1600, height: 1600, crop: 'limit' }, { quality: 'auto' }, { fetch_format: 'auto' }],
           },
           (error, result) => {
             if (error || !result?.public_id || !result.secure_url) {
@@ -78,10 +78,14 @@ export async function uploadProductImage(buffer: Buffer, erpProductId: string) {
         .end(buffer)
     }).catch(async (error) => {
       if (!config.uploadPreset) throw error
-      return unsignedUpload(buffer, erpProductId)
+      return unsignedUpload(buffer, folder, id)
     })
   }
-  return unsignedUpload(buffer, erpProductId)
+  return unsignedUpload(buffer, folder, id)
+}
+
+export async function uploadProductImage(buffer: Buffer, erpProductId: string) {
+  return uploadSiteImage(buffer, 'tarumed/products', erpProductId)
 }
 
 export async function deleteCloudinaryImage(publicId: string): Promise<void> {
