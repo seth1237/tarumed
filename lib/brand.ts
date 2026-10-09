@@ -1,7 +1,6 @@
 export const HERO_IMAGE = '/images/hero-medical-lab.jpg'
 
 export const HERO = {
-  kicker: 'Tarumed Supplies Limited · Eldoret, Kenya',
   title: 'Complete medical & laboratory solutions',
   lede: 'Specify, supply and support the equipment, laboratory range and hospital furniture your facility depends on — from Eldoret, across Kenya.',
 }

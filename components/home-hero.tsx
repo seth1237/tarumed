@@ -25,7 +25,6 @@ export function HomeHero({ productCount = 0 }: { productCount?: number }) {
       </div>
       <div className="home-hero-grid">
         <div className="home-hero-copy">
-          <span className="kicker">{HERO.kicker}</span>
           <h1 className="hero-title">{HERO.title}</h1>
           <p className="hero-lede">{HERO.lede}</p>
           <div className="hero-actions">
