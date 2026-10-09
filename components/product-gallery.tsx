@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { ProductPhoto } from '@/components/product-photo'
 import { productImageSrc, type CatalogProduct } from '@/lib/catalog'
+import { optimizedMediaUrl } from '@/lib/media'
 
 export function ProductGallery({ product }: { product: CatalogProduct }) {
   const images = product.images.length ? product.images : [productImageSrc(product)]
@@ -10,9 +12,7 @@ export function ProductGallery({ product }: { product: CatalogProduct }) {
 
   return (
     <div className="product-gallery">
-      <div className="product-image detail">
-        <img src={current} alt={product.name} />
-      </div>
+      <ProductPhoto src={current} alt={product.name} variant="detail" />
       {images.length > 1 && (
         <div className="gallery-thumbs">
           {images.map((src, index) => (
@@ -23,7 +23,7 @@ export function ProductGallery({ product }: { product: CatalogProduct }) {
               onClick={() => setActive(index)}
               aria-label={`Photo ${index + 1}`}
             >
-              <img src={src} alt="" />
+              <img src={optimizedMediaUrl(src, 160)} alt="" />
             </button>
           ))}
         </div>

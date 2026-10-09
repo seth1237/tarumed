@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
-import { formatKes, productHref, productImageSrc, type CatalogProduct } from '@/lib/catalog'
+import { formatKes, productBrand, productHref, productImageSrc, type CatalogProduct } from '@/lib/catalog'
+import { ProductPhoto } from '@/components/product-photo'
 import { useQuoteCart } from '@/components/quote-cart'
 
 export function ProductCard({
@@ -14,32 +14,28 @@ export function ProductCard({
 }) {
   const { add, has } = useQuoteCart()
   const inCart = has(product.id)
+  const brand = productBrand(product)
 
   return (
     <article className="product-card">
       <Link href={productHref(product)} className="product-card-link">
-        <div className="product-image">
-          <img src={productImageSrc(product)} alt={product.name} />
-          <span className="product-tag">In stock</span>
-        </div>
+        <ProductPhoto src={productImageSrc(product)} alt={product.name} />
         <div className="product-info">
-          <span className="product-category">{product.categoryName}</span>
+          {brand ? <span className="product-category">{brand}</span> : null}
           <h3>{product.name}</h3>
-          <div className="product-cta">
-            <strong className={showPrice ? '' : 'price-hidden'}>
-              {showPrice ? formatKes(product.price) : 'Request a quote'}
-            </strong>
-            <span className="view-detail">View details <ArrowRight size={14} /></span>
-          </div>
+          {showPrice && product.price > 0 ? <strong>{formatKes(product.price)}</strong> : null}
         </div>
       </Link>
-      <button
-        type="button"
-        className={inCart ? 'add-quote-btn in-cart' : 'add-quote-btn'}
-        onClick={() => add(product)}
-      >
-        {inCart ? 'Added to quote' : 'Add to quote'}
-      </button>
+      <div className="product-actions">
+        <Link href={productHref(product)} className="view-detail">View product</Link>
+        <button
+          type="button"
+          className={inCart ? 'add-quote-btn in-cart' : 'add-quote-btn'}
+          onClick={() => add(product)}
+        >
+          {inCart ? 'Added to quote' : 'Add to quote'}
+        </button>
+      </div>
     </article>
   )
 }

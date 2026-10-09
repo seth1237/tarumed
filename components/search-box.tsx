@@ -90,7 +90,6 @@ export function SearchBox({
               }}
             >
               <strong>{product.name}</strong>
-              <small>{product.categoryName}</small>
             </Link>
           ))}
           <button type="button" className="search-all" onClick={goToResults}>

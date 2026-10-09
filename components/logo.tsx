@@ -2,11 +2,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { COMPANY } from '@/lib/utils'
 
-export function Logo({ compact = false }: { compact?: boolean }) {
+export function Logo({ compact = false, variant = 'default' }: { compact?: boolean; variant?: 'default' | 'nav' }) {
+  const nav = variant === 'nav'
   return (
-    <Link href="/" className="logo" aria-label={`${COMPANY.name} home`}>
+    <Link href="/" className={nav ? 'logo logo-nav' : 'logo'} aria-label={`${COMPANY.name} home`}>
       <Image
-        src="/logo.png"
+        src={nav ? '/tarumed-nav-logo.png' : '/logo.png'}
         alt={`${COMPANY.name} — ${COMPANY.tagline}`}
         width={300}
         height={100}

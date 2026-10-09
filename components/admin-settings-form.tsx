@@ -39,7 +39,7 @@ export function AdminSettingsForm({ showPrices }: { showPrices: boolean }) {
         <div className="setting-row">
           <div>
             <h3>Show prices on the website</h3>
-            <span>Visitors cannot change this. When off, product cards show “Request a quote”.</span>
+            <span>Visitors cannot change this. When off, product prices are hidden on the storefront.</span>
           </div>
           <button type="button" className={pricesOn ? 'fake-switch on' : 'fake-switch'} onClick={togglePrices} aria-pressed={pricesOn}>
             <span />

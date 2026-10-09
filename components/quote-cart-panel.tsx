@@ -80,7 +80,6 @@ export function QuoteCartPanel() {
           <article key={item.id} className="quote-item">
             <div>
               <Link href={productHref(item)} className="quote-item-name">{item.name}</Link>
-              <small>{item.categoryName}</small>
             </div>
             <div className="quote-item-qty">
               <button type="button" aria-label="Decrease quantity" onClick={() => setQuantity(item.id, item.quantity - 1)}>

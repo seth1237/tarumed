@@ -132,3 +132,38 @@ export function isProductObjectId(value: string) {
 export function productImageSrc(product: Pick<CatalogProduct, 'image'>) {
   return product.image || PLACEHOLDER
 }
+
+export function productCode(product: Pick<CatalogProduct, 'id'>) {
+  return `TRM-${String(product.id).slice(-6).toUpperCase()}`
+}
+
+export function productBrand(product: Pick<CatalogProduct, 'manufacturer'>) {
+  const brand = String(product.manufacturer || '').trim()
+  if (!brand || brand.toLowerCase() === 'none') return ''
+  return brand
+}
+
+export function productDescription(product: Pick<CatalogProduct, 'name' | 'categoryName' | 'description' | 'details'>) {
+  const noise = new Set(
+    [product.name, product.categoryName, 'none', 'n/a', 'na']
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean),
+  )
+  for (const candidate of [product.details, product.description]) {
+    const text = String(candidate || '').trim()
+    if (text && !noise.has(text.toLowerCase())) return text
+  }
+  return ''
+}
+
+export function productSpecs(product: CatalogProduct) {
+  const brand = productBrand(product)
+  const specs: Array<{ label: string; value: string }> = []
+  if (brand) specs.push({ label: 'Brand', value: brand })
+  specs.push(
+    { label: 'Product code', value: productCode(product) },
+    { label: 'Packaging', value: product.unit || 'unit' },
+    { label: 'Availability', value: product.inStock ? 'In stock' : 'On request' },
+  )
+  return specs
+}

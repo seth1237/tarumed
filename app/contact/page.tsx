@@ -1,14 +1,12 @@
 import { Mail, MapPin, Phone, Clock } from 'lucide-react'
 import { ContactForm } from '@/components/contact-form'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { PageShell } from '@/components/page-shell'
 import { COMPANY } from '@/lib/utils'
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen">
-      <SiteHeader />
-      <section id="contact" className="shell section contact-page">
+    <PageShell>
+      <section id="contact" className="home-block contact-page">
         <span className="kicker">Get in touch</span>
         <h1 className="page-title">Contact <em>us.</em></h1>
         <p className="hero-lede">Reach Tarumed Supplies Limited in Eldoret for equipment, laboratory supplies, and quotes.</p>
@@ -46,7 +44,6 @@ export default function ContactPage() {
           <ContactForm />
         </div>
       </section>
-      <SiteFooter />
-    </main>
+    </PageShell>
   )
 }

@@ -54,8 +54,8 @@ export function RelatedProducts({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <span className="kicker">Also of interest</span>
-            <h2>Other products of interest</h2>
+            <span className="kicker">You may also need</span>
+            <h2>Related products</h2>
           </div>
           <div className="related-controls">
             <button type="button" className="related-arrow" onClick={() => scrollByCard(-1)} aria-label="Previous products">

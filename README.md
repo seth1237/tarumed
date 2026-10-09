@@ -12,7 +12,9 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). `.env.development` keeps the site URL on localhost even if a production `.env` is present.
 
-The homepage loads from the ERP. If that API is slow or down, requests time out after a few seconds and the last successful catalogue is reused from `.cache/` so local work can continue.
+The storefront presents Tarumed as a medical supplies company first; the live ERP catalogue sits behind Products and the division pages. See [`docs/storefront-brand-guide.md`](docs/storefront-brand-guide.md).
+
+The catalogue loads from the ERP. If that API is slow or down, requests time out after a few seconds and the last successful catalogue is reused from `.cache/` so local work can continue.
 
 ## Deploy
 

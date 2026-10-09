@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { recordRecentView } from '@/lib/recent-views'
 
 const LAST_KEY = 'tarumed-last-product'
 
@@ -16,6 +17,8 @@ export function TrackProductClick({
   categoryName: string
 }) {
   useEffect(() => {
+    recordRecentView(productId)
+
     const key = `tarumed-click-${productId}`
     let fromProductId = ''
     try {

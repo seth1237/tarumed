@@ -1,13 +1,12 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { PageShell } from '@/components/page-shell'
 import { QuoteForm } from '@/components/quote-form'
 import { ProductGallery } from '@/components/product-gallery'
 import { TrackProductClick } from '@/components/track-product-click'
 import { RelatedProducts } from '@/components/related-products'
-import { formatKes, productHref } from '@/lib/catalog'
+import { formatKes, productBrand, productDescription, productHref, productSpecs } from '@/lib/catalog'
 import { getCatalogProduct, getPriceVisibility, getRelatedProducts } from '@/lib/catalog-data'
 import { COMPANY } from '@/lib/utils'
 
@@ -18,13 +17,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const product = await getCatalogProduct(id)
   if (!product) return { title: COMPANY.name }
   const image = product.image || COMPANY.logo
+  const description = productDescription(product) || `${product.name} from ${COMPANY.name}`
   return {
     title: `${product.name} | ${COMPANY.shortName}`,
-    description: product.description || `${product.name} from ${COMPANY.name}`,
+    description,
     alternates: { canonical: `${COMPANY.url}${productHref(product)}` },
     openGraph: {
       title: product.name,
-      description: product.description || `${product.name} from ${COMPANY.name}`,
+      description,
       url: `${COMPANY.url}${productHref(product)}`,
       images: [{ url: image.startsWith('http') ? image : COMPANY.logo, alt: product.name }],
     },
@@ -42,32 +42,46 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     getPriceVisibility(),
     getRelatedProducts(product, 10),
   ])
+  const description = productDescription(product)
+  const brand = productBrand(product)
+  const specs = productSpecs(product)
 
   return (
-    <main className="min-h-screen">
+    <PageShell>
       <TrackProductClick
         productId={product.id}
         productName={product.name}
         categoryId={product.categoryId}
         categoryName={product.categoryName}
       />
-      <SiteHeader />
       <section className="shell section product-detail">
         <Link href="/shop" className="text-link">← Back to products</Link>
         <div className="product-detail-grid">
           <ProductGallery product={product} />
-          <div>
-            <span className="kicker">{product.categoryName}</span>
-            <h1 className="page-title">{product.name}</h1>
-            <p className="hero-lede product-details">{product.description || 'Professional medical supply from the Tarumed ERP catalogue.'}</p>
-            <p className="detail-price">{showPrices ? formatKes(product.price) : 'Request a quote'}</p>
-            {product.manufacturer && <p className="text-muted-foreground">Manufacturer: {product.manufacturer}</p>}
+          <div className="product-detail-copy">
+            {brand ? <span className="kicker">{brand}</span> : null}
+            <h1 className="product-title">{product.name}</h1>
+            <p className="product-stock">{product.inStock ? 'In stock' : 'On request'}</p>
+            {showPrices && product.price > 0 ? <p className="detail-price">{formatKes(product.price)}</p> : null}
             <QuoteForm product={product} />
+            <dl className="product-specs">
+              {specs.map((spec) => (
+                <div key={spec.label}>
+                  <dt>{spec.label}</dt>
+                  <dd>{spec.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="product-copy">
+              <h2>Product description</h2>
+              <p className="product-details">
+                {description || `${product.name} is part of ours, supplied to hospitals, clinics and laboratories across Kenya. Ask our team for specifications, installation and a formal quote.`}
+              </p>
+            </div>
           </div>
         </div>
       </section>
       {related.length > 0 && <RelatedProducts products={related} showPrices={showPrices} />}
-      <SiteFooter />
-    </main>
+    </PageShell>
   )
 }

@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { PageShell } from '@/components/page-shell'
 import { CatalogBrowser } from '@/components/catalog-browser'
 import { getCatalog, getPriceVisibility } from '@/lib/catalog-data'
 
@@ -15,12 +14,11 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
   const products = catalog.products.filter((product) => product.categoryId === id)
 
   return (
-    <main className="min-h-screen">
-      <SiteHeader />
-      <section id="products" className="shell section">
+    <PageShell>
+      <section id="products" className="shell section page-intro">
         <span className="kicker">Category</span>
         <h1 className="page-title">{category.name}</h1>
-        <p className="hero-lede">{category.description || 'Products in this ERP category.'} · {products.length} items</p>
+        <p className="hero-lede">{category.description || `Products in ${category.name}.`} · {products.length} items</p>
         <div className="catalog-body">
           <Suspense>
             <CatalogBrowser
@@ -30,7 +28,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
           </Suspense>
         </div>
       </section>
-      <SiteFooter />
-    </main>
+    </PageShell>
   )
 }

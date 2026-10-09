@@ -1,6 +1,5 @@
 import { Suspense } from 'react'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { PageShell } from '@/components/page-shell'
 import { CatalogBrowser } from '@/components/catalog-browser'
 import { getCatalog, getPriceVisibility } from '@/lib/catalog-data'
 
@@ -14,19 +13,17 @@ export default async function Shop({ searchParams }: { searchParams: Promise<{ q
   ])
 
   return (
-    <main className="min-h-screen">
-      <SiteHeader />
-      <section id="products" className="shell section">
-        <span className="kicker">ERP catalogue · Live inventory</span>
-        <h1 className="page-title">All <em>products.</em></h1>
-        <p className="hero-lede">Browse medical equipment and supplies currently listed in the Tarumed ERP.</p>
+    <PageShell>
+      <section id="products" className="home-block page-intro">
+        <span className="kicker">Product catalogue</span>
+        <h1 className="page-title">All products</h1>
+        <p className="hero-lede">Browse medical equipment, laboratory solutions and healthcare supplies from Tarumed.</p>
         <div className="catalog-body">
           <Suspense>
             <CatalogBrowser catalog={catalog} showPrices={showPrices} initialQuery={params.q || ''} />
           </Suspense>
         </div>
       </section>
-      <SiteFooter />
-    </main>
+    </PageShell>
   )
 }

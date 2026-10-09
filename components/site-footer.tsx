@@ -8,14 +8,22 @@ export function SiteFooter() {
       <div className="shell footer-simple">
         <div>
           <Logo compact />
-          <p>{COMPANY.tagline}. Medical equipment, laboratory supplies, and clinical consumables for hospitals and clinics across Kenya.</p>
+          <p>{COMPANY.tagline}. Medical equipment, laboratory solutions, hospital furniture and healthcare products for hospitals and clinics across Kenya.</p>
         </div>
         <div className="footer-col">
           <strong>Explore</strong>
+          <Link href="/">Home</Link>
           <Link href="/shop">Products</Link>
+          <Link href="/solutions">Solutions</Link>
+          <Link href="/services">Services</Link>
+          <Link href="/about">About us</Link>
+        </div>
+        <div className="footer-col">
+          <strong>Company</strong>
           <Link href="/blog">Blog</Link>
-          <Link href="/jobs">Jobs</Link>
+          <Link href="/jobs">Careers</Link>
           <Link href="/contact">Contact</Link>
+          <Link href="/quote">Request a quote</Link>
         </div>
         <div className="footer-col">
           <strong>Contact</strong>
@@ -27,11 +35,13 @@ export function SiteFooter() {
       </div>
       <div className="shell footer-bottom">
         <span>© {new Date().getFullYear()} {COMPANY.name}</span>
-        <a className="builder-credit" href={COMPANY.builderUrl} target="_blank" rel="noopener noreferrer">
-          <span className="builder-logo-wrap">
-            <img src="/codewithseth-logo.jpg" alt={COMPANY.builderName} />
-          </span>
-          <span>System designed, built and managed by {COMPANY.builderName}</span>
+        <a
+          className="systems-by"
+          href={COMPANY.builderUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {COMPANY.builderLabel}
         </a>
       </div>
     </footer>
