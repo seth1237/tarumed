@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
-import { formatKes, type CatalogProduct } from '@/lib/catalog'
+import { ArrowLeft, Minus, Plus } from 'lucide-react'
+import { formatKes, productCode, type CatalogProduct } from '@/lib/catalog'
 import { COMPANY } from '@/lib/utils'
 import { ProductShare } from '@/components/product-share'
 import { useQuoteCart } from '@/components/quote-cart'
@@ -16,17 +16,23 @@ function WhatsAppIcon() {
   )
 }
 
-function whatsappHref(product: CatalogProduct) {
-  const text = `Hello Tarumed, I would like a quote for ${product.name} (${product.categoryName}).`
+function whatsappHref(product: CatalogProduct, quantity: number) {
+  const sku = productCode(product)
+  const text = `Hello Tarumed, I would like a quote for ${quantity} × ${product.name} (${sku}).`
   return `https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(text)}`
 }
 
 export function QuoteForm({ product }: { product: CatalogProduct }) {
   const [mode, setMode] = useState<'choose' | 'system'>('choose')
+  const [quantity, setQuantity] = useState(1)
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
-  const { add, has } = useQuoteCart()
-  const inCart = has(product.id)
+  const { add, has, ready } = useQuoteCart()
+  const inCart = ready && has(product.id)
+
+  function clampQty(value: number) {
+    return Math.max(1, Math.min(1000, Math.floor(value) || 1))
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -46,8 +52,7 @@ export function QuoteForm({ product }: { product: CatalogProduct }) {
           email: data.get('email'),
           items: [{
             productId: product.id,
-            quantity: Number(data.get('quantity') || 1),
-            unitPrice: product.price,
+            quantity: Number(data.get('quantity') || quantity),
           }],
         }),
       })
@@ -67,11 +72,34 @@ export function QuoteForm({ product }: { product: CatalogProduct }) {
   if (mode === 'choose') {
     return (
       <div className="quote-form product-cta-panel">
+        <div className="qty-row">
+          <span>Quantity</span>
+          <div className="quote-item-qty">
+            <button type="button" aria-label="Decrease quantity" onClick={() => setQuantity((value) => clampQty(value - 1))}>
+              <Minus size={14} />
+            </button>
+            <input
+              type="number"
+              min={1}
+              max={1000}
+              value={quantity}
+              onChange={(event) => setQuantity(clampQty(Number(event.target.value)))}
+              aria-label={`${product.name} quantity`}
+            />
+            <button type="button" aria-label="Increase quantity" onClick={() => setQuantity((value) => clampQty(value + 1))}>
+              <Plus size={14} />
+            </button>
+          </div>
+        </div>
         <div className="product-cta-row">
-          <button type="button" className={inCart ? 'button button-outline button-lg' : 'button button-primary button-lg'} onClick={() => add(product)}>
+          <button
+            type="button"
+            className={inCart ? 'button button-outline button-lg' : 'button button-primary button-lg'}
+            onClick={() => add(product, quantity)}
+          >
             {inCart ? 'Added to quote' : 'Add to quote'}
           </button>
-          <a className="wa-button wa-button-lg" href={whatsappHref(product)} target="_blank" rel="noopener noreferrer">
+          <a className="wa-button wa-button-lg" href={whatsappHref(product, quantity)} target="_blank" rel="noopener noreferrer">
             <WhatsAppIcon />
             Ask on WhatsApp
           </a>
@@ -99,7 +127,7 @@ export function QuoteForm({ product }: { product: CatalogProduct }) {
       <label>Phone<input name="clientNumber" required placeholder="+254 7.." /></label>
       <label>Email<input name="email" type="email" placeholder="you@hospital.co.ke" /></label>
       <label>Location<input name="clientLocation" required placeholder="Eldoret, Kenya" /></label>
-      <label>Quantity<input name="quantity" type="number" min={1} max={1000} defaultValue={1} /></label>
+      <label>Quantity<input name="quantity" type="number" min={1} max={1000} defaultValue={quantity} /></label>
       <button className="button button-primary button-compact" disabled={status === 'sending'}>
         {status === 'sending' ? 'Sending…' : 'Send quote request'}
       </button>

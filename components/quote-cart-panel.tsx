@@ -16,12 +16,17 @@ function WhatsAppIcon() {
 }
 
 export function QuoteCartPanel() {
-  const { items, setQuantity, remove, clear } = useQuoteCart()
+  const { items, setQuantity, remove, clear, count } = useQuoteCart()
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const priced = items.filter((item) => item.price > 0)
+  const subtotal = priced.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   const whatsappHref = () => {
-    const lines = items.map((item) => `- ${item.quantity} × ${item.name}`)
+    const lines = items.map((item) => {
+      const sku = item.sku ? ` [${item.sku}]` : ''
+      return `- ${item.quantity} × ${item.name}${sku}`
+    })
     const text = `Hello Tarumed, I would like a quote for:\n${lines.join('\n')}`
     return `https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(text)}`
   }
@@ -46,7 +51,6 @@ export function QuoteCartPanel() {
           items: items.map((item) => ({
             productId: item.id,
             quantity: item.quantity,
-            unitPrice: item.price,
           })),
         }),
       })
@@ -78,8 +82,12 @@ export function QuoteCartPanel() {
       <div className="quote-items">
         {items.map((item) => (
           <article key={item.id} className="quote-item">
+            <Link href={productHref(item)} className="quote-item-media" aria-hidden="true">
+              {item.image ? <img src={item.image} alt="" /> : <span />}
+            </Link>
             <div>
               <Link href={productHref(item)} className="quote-item-name">{item.name}</Link>
+              {item.sku ? <small>{item.sku}</small> : null}
             </div>
             <div className="quote-item-qty">
               <button type="button" aria-label="Decrease quantity" onClick={() => setQuantity(item.id, item.quantity - 1)}>
@@ -105,14 +113,18 @@ export function QuoteCartPanel() {
         ))}
       </div>
       <div className="quote-side">
+        <div className="quote-summary">
+          <p>{count === 1 ? '1 item' : `${count} items`}</p>
+          {subtotal > 0 ? <strong>{formatKes(subtotal)}</strong> : <strong>Price on request</strong>}
+        </div>
         <a className="wa-button" href={whatsappHref()} target="_blank" rel="noopener noreferrer">
           <WhatsAppIcon />
           Ask on WhatsApp
         </a>
         <form className="quote-form" onSubmit={onSubmit}>
           <div className="quote-form-head">
-            <h2>Request from the system</h2>
-            <p>{items.length} product{items.length === 1 ? '' : 's'} in this quote</p>
+            <h2>Request a quote</h2>
+            <p>Send this list to Tarumed. Availability and pricing are confirmed when we receive it.</p>
           </div>
           <label>Facility / company<input name="clientName" required placeholder="Hospital or clinic name" /></label>
           <label>Contact person<input name="contactPerson" placeholder="Your name" /></label>

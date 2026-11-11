@@ -50,8 +50,7 @@ export function RelatedProducts({
   const looped = products.length > 2 ? [...products, ...products] : products
 
   return (
-    <section className="related-section">
-      <div className="shell">
+    <section className="home-block related-section">
         <div className="section-heading">
           <div>
             <span className="kicker">You may also need</span>
@@ -80,7 +79,6 @@ export function RelatedProducts({
             ))}
           </div>
         </div>
-      </div>
     </section>
   )
 }

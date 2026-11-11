@@ -17,7 +17,7 @@ export const ABOUT_INTRO =
 
 export const ABOUT_BODY = [
   'We work with hospitals, clinics, diagnostic laboratories and specialised units that need dependable medical and laboratory supplies, not just a list of SKUs. Our team helps facilities choose the right equipment, arrange delivery, and stay supported after installation.',
-  'The catalogue on this website is ours. Browse by healthcare division, add items to a quote, or talk to us on WhatsApp when you need advice on a specification.',
+  'The catalogue on this website is the same stock we supply to facilities. Browse by category, add items to a quote, or talk to us on WhatsApp when you need advice on a specification.',
 ]
 
 export const WHY_TARUMED = [

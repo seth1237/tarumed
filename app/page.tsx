@@ -1,7 +1,7 @@
 import { HashRedirect } from '@/components/hash-redirect'
 import { HomeHero } from '@/components/home-hero'
 import { FeaturedSection } from '@/components/featured-section'
-import { AboutTeaser, ServicesTeaser, WhySection } from '@/components/home-sections'
+import { AboutTeaser, WhySection } from '@/components/home-sections'
 import { PageShell } from '@/components/page-shell'
 import { getCatalog, getPriceVisibility } from '@/lib/catalog-data'
 
@@ -14,9 +14,8 @@ export default async function Page() {
     <PageShell>
       <HashRedirect />
       <HomeHero productCount={catalog.products.length} />
-      <FeaturedSection products={catalog.products} showPrices={showPrices} />
+      <FeaturedSection products={catalog.products} categories={catalog.categories} showPrices={showPrices} />
       <WhySection />
-      <ServicesTeaser />
       <AboutTeaser />
     </PageShell>
   )

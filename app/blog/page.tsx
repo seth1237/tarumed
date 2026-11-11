@@ -1,6 +1,7 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { PageShell } from '@/components/page-shell'
+import { COMPANY } from '@/lib/utils'
 
 const posts = [
   {
@@ -17,13 +18,17 @@ const posts = [
   },
 ]
 
+export const metadata: Metadata = {
+  title: `Blog | ${COMPANY.shortName}`,
+  description: 'Clinical insights, company news, and practical perspectives from the Tarumed team.',
+}
+
 export default function Blog() {
   return (
-    <main className="min-h-screen">
-      <SiteHeader />
-      <section className="shell section blog-page">
+    <PageShell>
+      <section className="home-block page-intro blog-page">
         <span className="kicker">From the field</span>
-        <h1 className="page-title">Ideas worth <em>sharing.</em></h1>
+        <h1 className="page-title">Ideas worth sharing</h1>
         <p className="hero-lede">Clinical insights, company news, and practical perspectives from the Tarumed team.</p>
         <div className="post-grid">
           {posts.map((post) => (
@@ -39,7 +44,6 @@ export default function Blog() {
         </div>
         <Link href="/" className="text-link">← Back to Tarumed</Link>
       </section>
-      <SiteFooter />
-    </main>
+    </PageShell>
   )
 }

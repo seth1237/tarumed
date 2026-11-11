@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { PageShell } from '@/components/page-shell'
@@ -6,6 +5,7 @@ import { QuoteForm } from '@/components/quote-form'
 import { ProductGallery } from '@/components/product-gallery'
 import { TrackProductClick } from '@/components/track-product-click'
 import { RelatedProducts } from '@/components/related-products'
+import { Breadcrumbs } from '@/components/breadcrumbs'
 import { formatKes, productBrand, productDescription, productHref, productSpecs } from '@/lib/catalog'
 import { getCatalogProduct, getPriceVisibility, getRelatedProducts } from '@/lib/catalog-data'
 import { COMPANY } from '@/lib/utils'
@@ -54,14 +54,20 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         categoryId={product.categoryId}
         categoryName={product.categoryName}
       />
-      <section className="shell section product-detail">
-        <Link href="/shop" className="text-link">← Back to products</Link>
+      <section className="home-block product-detail">
+        <Breadcrumbs items={[
+          { href: '/', label: 'Home' },
+          { href: '/shop', label: 'Products' },
+          { label: product.name },
+        ]} />
         <div className="product-detail-grid">
           <ProductGallery product={product} />
           <div className="product-detail-copy">
             {brand ? <span className="kicker">{brand}</span> : null}
             <h1 className="product-title">{product.name}</h1>
-            <p className="product-stock">{product.inStock ? 'In stock' : 'On request'}</p>
+            <p className={product.inStock ? 'product-stock' : 'product-stock out'}>
+              {product.inStock ? 'In stock' : 'Available on request'}
+            </p>
             {showPrices && product.price > 0 ? <p className="detail-price">{formatKes(product.price)}</p> : null}
             <QuoteForm product={product} />
             <dl className="product-specs">
@@ -75,7 +81,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             <div className="product-copy">
               <h2>Product description</h2>
               <p className="product-details">
-                {description || `${product.name} is part of ours, supplied to hospitals, clinics and laboratories across Kenya. Ask our team for specifications, installation and a formal quote.`}
+                {description || `${product.name} is supplied to hospitals, clinics and laboratories across Kenya. Ask our team for specifications, installation and a formal quote.`}
               </p>
             </div>
           </div>

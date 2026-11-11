@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Search } from 'lucide-react'
-import { productHref, type SearchProduct } from '@/lib/catalog'
+import { productHref, productMatchesQuery, type SearchProduct } from '@/lib/catalog'
 
 export function SearchBox({
   products,
@@ -15,17 +15,21 @@ export function SearchBox({
 }) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const wrapRef = useRef<HTMLDivElement>(null)
-  const [query, setQuery] = useState('')
+  const urlQuery = pathname === '/shop' ? searchParams.get('q') || '' : ''
+  const [query, setQuery] = useState(urlQuery)
   const [open, setOpen] = useState(false)
   const [dirty, setDirty] = useState(false)
 
+  useEffect(() => {
+    if (!dirty) setQuery(urlQuery)
+  }, [urlQuery, dirty])
+
   const matches = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const q = query.trim()
     if (q.length < 1) return []
-    return products
-      .filter((product) => `${product.name} ${product.categoryName}`.toLowerCase().includes(q))
-      .slice(0, 8)
+    return products.filter((product) => productMatchesQuery(product, q)).slice(0, 8)
   }, [products, query])
 
   useEffect(() => {
@@ -40,15 +44,28 @@ export function SearchBox({
     if (pathname !== '/shop' || !dirty) return
     const q = query.trim()
     const timer = window.setTimeout(() => {
-      const next = q ? `/shop?q=${encodeURIComponent(q)}` : '/shop'
-      router.replace(next, { scroll: false })
+      const params = new URLSearchParams(searchParams.toString())
+      if (q) params.set('q', q)
+      else params.delete('q')
+      params.delete('page')
+      const qs = params.toString()
+      router.replace(qs ? `/shop?${qs}` : '/shop', { scroll: false })
     }, 120)
     return () => window.clearTimeout(timer)
-  }, [query, pathname, router, dirty])
+  }, [query, pathname, router, dirty, searchParams])
 
   function goToResults() {
     const q = query.trim()
-    router.push(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop')
+    if (pathname === '/shop') {
+      const params = new URLSearchParams(searchParams.toString())
+      if (q) params.set('q', q)
+      else params.delete('q')
+      params.delete('page')
+      const qs = params.toString()
+      router.push(qs ? `/shop?${qs}` : '/shop')
+    } else {
+      router.push(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop')
+    }
     setOpen(false)
     onNavigate?.()
   }
@@ -74,6 +91,8 @@ export function SearchBox({
           aria-label="Search products"
           aria-autocomplete="list"
           autoComplete="off"
+          inputMode="search"
+          enterKeyHint="search"
         />
       </form>
       {open && query.trim() && (
@@ -90,6 +109,7 @@ export function SearchBox({
               }}
             >
               <strong>{product.name}</strong>
+              {product.sku ? <small>{product.sku}</small> : null}
             </Link>
           ))}
           <button type="button" className="search-all" onClick={goToResults}>

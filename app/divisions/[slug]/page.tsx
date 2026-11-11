@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
+import { Breadcrumbs } from '@/components/breadcrumbs'
 import { CatalogBrowser } from '@/components/catalog-browser'
 import { PageShell } from '@/components/page-shell'
 import { getCatalog, getPriceVisibility } from '@/lib/catalog-data'
@@ -29,9 +29,12 @@ export default async function DivisionPage({ params }: { params: Promise<{ slug:
 
   return (
     <PageShell>
-      <section id="products" className="shell section page-intro">
-        <Link href="/shop" className="text-link">← All products</Link>
-        <span className="kicker">Product division</span>
+      <section id="products" className="home-block page-intro">
+        <Breadcrumbs items={[
+          { href: '/', label: 'Home' },
+          { href: '/shop', label: 'Products' },
+          { label: division.name },
+        ]} />
         <h1 className="page-title">{division.name}</h1>
         <p className="hero-lede">{division.description} · {division.count} products</p>
         <div className="catalog-body">

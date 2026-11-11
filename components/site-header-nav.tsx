@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { Menu, ShoppingCart, X } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import { SearchBox } from '@/components/search-box'
 import { useQuoteCart } from '@/components/quote-cart'
-import type { SearchProduct } from '@/lib/catalog'
+import type { CategoryLink, SearchProduct } from '@/lib/catalog'
 
 const links = [
   { href: '/', label: 'Home' },
@@ -21,12 +21,14 @@ const links = [
 
 export function SiteHeaderNav({
   products,
+  categories,
 }: {
   products: SearchProduct[]
+  categories: CategoryLink[]
 }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
-  const { count } = useQuoteCart()
+  const { count, ready } = useQuoteCart()
 
   function closeMenu() {
     setOpen(false)
@@ -37,8 +39,18 @@ export function SiteHeaderNav({
     return pathname === href || pathname.startsWith(`${href}/`)
   }
 
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [open])
+
   return (
     <header className="site-header">
+      <Suspense>
+        <CloseOnNavigate onClose={closeMenu} />
+      </Suspense>
       <div className="nav-island">
         <Logo variant="nav" />
         <nav className="main-nav" aria-label="Primary">
@@ -49,10 +61,12 @@ export function SiteHeaderNav({
           ))}
         </nav>
         <div className="header-actions">
-          <SearchBox products={products} />
-          <Link href="/quote" className="cart-link" aria-label={`Quote cart, ${count} items`}>
+          <Suspense fallback={<div className="search-wrap" />}>
+            <SearchBox products={products} />
+          </Suspense>
+          <Link href="/quote" className="cart-link" aria-label={`Quote cart, ${ready ? count : 0} items`}>
             <ShoppingCart size={18} />
-            {count > 0 && <span className="cart-count">{count}</span>}
+            {ready && count > 0 && <span className="cart-count">{count}</span>}
           </Link>
         </div>
         <button className="mobile-trigger" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
@@ -68,17 +82,72 @@ export function SiteHeaderNav({
                 key={link.href}
                 href={link.href}
                 className={isActive(link.href) ? 'active' : undefined}
-                onClick={closeMenu}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
-          <Link href="/quote" className="mobile-quote" onClick={closeMenu}>
+          {categories.length > 0 && (
+            <Suspense>
+              <MobileCategoryNav categories={categories} />
+            </Suspense>
+          )}
+          <Link href="/quote" className="mobile-quote">
             Quote cart{count > 0 ? ` (${count})` : ''}
           </Link>
         </div>
       )}
     </header>
+  )
+}
+
+function CloseOnNavigate({ onClose }: { onClose: () => void }) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const route = `${pathname}?${searchParams}`
+  const previous = useRef(route)
+
+  useEffect(() => {
+    if (previous.current === route) return
+    previous.current = route
+    onClose()
+  }, [route, onClose])
+
+  return null
+}
+
+function MobileCategoryNav({
+  categories,
+}: {
+  categories: CategoryLink[]
+}) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const activeCategory = pathname === '/shop' ? searchParams.get('category') || '' : ''
+  const total = categories.reduce((sum, category) => sum + category.count, 0)
+
+  return (
+    <nav className="mobile-categories" aria-label="Product categories">
+      <p>Categories</p>
+      <div className="mobile-category-list">
+        <Link
+          href="/shop"
+          className={pathname === '/shop' && !activeCategory ? 'active' : undefined}
+        >
+          <span>All products</span>
+          <small>{total}</small>
+        </Link>
+        {categories.map((category) => (
+          <Link
+            key={category.id}
+            href={`/shop?category=${encodeURIComponent(category.id)}`}
+            className={activeCategory === category.id ? 'active' : undefined}
+          >
+            <span>{category.name}</span>
+            <small>{category.count}</small>
+          </Link>
+        ))}
+      </div>
+    </nav>
   )
 }

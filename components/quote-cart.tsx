@@ -12,13 +12,16 @@ export type QuoteCartItem = {
   categoryName: string
   price: number
   quantity: number
+  sku?: string
+  image?: string | null
 }
 
 type QuoteCartContextValue = {
   items: QuoteCartItem[]
   count: number
+  ready: boolean
   has: (id: string) => boolean
-  add: (product: Pick<CatalogProduct, 'id' | 'name' | 'slug' | 'categoryName' | 'price'>, quantity?: number) => void
+  add: (product: Pick<CatalogProduct, 'id' | 'name' | 'slug' | 'categoryName' | 'price' | 'sku' | 'image'>, quantity?: number) => void
   remove: (id: string) => void
   setQuantity: (id: string, quantity: number) => void
   clear: () => void
@@ -52,7 +55,7 @@ export function QuoteCartProvider({ children }: { children: React.ReactNode }) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
   }, [items, ready])
 
-  const add = useCallback((product: Pick<CatalogProduct, 'id' | 'name' | 'slug' | 'categoryName' | 'price'>, quantity = 1) => {
+  const add = useCallback((product: Pick<CatalogProduct, 'id' | 'name' | 'slug' | 'categoryName' | 'price' | 'sku' | 'image'>, quantity = 1) => {
     setItems((current) => {
       const found = current.find((item) => item.id === product.id)
       if (found) {
@@ -69,6 +72,8 @@ export function QuoteCartProvider({ children }: { children: React.ReactNode }) {
         categoryName: product.categoryName,
         price: Number(product.price || 0),
         quantity: Math.max(1, quantity),
+        sku: product.sku,
+        image: product.image,
       }]
     })
   }, [])
@@ -78,8 +83,12 @@ export function QuoteCartProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const setQuantity = useCallback((id: string, quantity: number) => {
-    const next = Math.max(1, Math.min(1000, Math.floor(quantity) || 1))
-    setItems((current) => current.map((item) => (item.id === id ? { ...item, quantity: next } : item)))
+    const next = Math.floor(quantity) || 0
+    if (next < 1) {
+      setItems((current) => current.filter((item) => item.id !== id))
+      return
+    }
+    setItems((current) => current.map((item) => (item.id === id ? { ...item, quantity: Math.min(1000, next) } : item)))
   }, [])
 
   const clear = useCallback(() => setItems([]), [])
@@ -87,12 +96,13 @@ export function QuoteCartProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<QuoteCartContextValue>(() => ({
     items,
     count: items.reduce((sum, item) => sum + item.quantity, 0),
+    ready,
     has: (id: string) => items.some((item) => item.id === id),
     add,
     remove,
     setQuantity,
     clear,
-  }), [items, add, remove, setQuantity, clear])
+  }), [items, ready, add, remove, setQuantity, clear])
 
   return <QuoteCartContext.Provider value={value}>{children}</QuoteCartContext.Provider>
 }

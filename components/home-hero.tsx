@@ -13,10 +13,10 @@ const serviceIcons = [Stethoscope, FlaskConical, BedDouble, Headset]
 
 export function HomeHero({ productCount = 0 }: { productCount?: number }) {
   const catalogueLabel = productCount > 0 ? `${productCount}+` : 'Live'
-  const catalogueText = productCount > 0 ? 'Products in the live catalogue' : 'Products ready to quote'
+  const catalogueText = 'Products ready to quote'
 
   return (
-    <section className="home-hero">
+    <section className="home-hero hero-enter">
       <div className="home-hero-orbs" aria-hidden="true">
         <span className="orb orb-a" />
         <span className="orb orb-b" />
@@ -31,8 +31,8 @@ export function HomeHero({ productCount = 0 }: { productCount?: number }) {
             <Link href="/shop" className="button button-primary button-lg">
               Shop products
             </Link>
-            <Link href="/about" className="hero-text-link">
-              Learn more
+            <Link href="/quote" className="hero-text-link">
+              Request a quote
             </Link>
           </div>
           <div className="hero-services">

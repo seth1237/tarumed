@@ -1,7 +1,13 @@
+import type { Metadata } from 'next'
 import { Mail, MapPin, Phone, Clock } from 'lucide-react'
 import { ContactForm } from '@/components/contact-form'
 import { PageShell } from '@/components/page-shell'
 import { COMPANY } from '@/lib/utils'
+
+export const metadata: Metadata = {
+  title: `Contact | ${COMPANY.shortName}`,
+  description: 'Reach Tarumed Supplies Limited in Eldoret for equipment, laboratory supplies, and quotes.',
+}
 
 export default function ContactPage() {
   return (

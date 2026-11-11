@@ -9,6 +9,7 @@ export type CatalogProduct = {
   categoryName: string
   price: number
   unit: string
+  sku: string
   stock: number
   inStock: boolean
   image: string | null
@@ -34,12 +35,17 @@ export type SearchProduct = {
   name: string
   slug: string
   categoryName: string
+  sku?: string
+  manufacturer?: string
 }
 
-export type NavCategory = {
+export type CategoryLink = {
   id: string
   name: string
   count: number
+}
+
+export type NavCategory = CategoryLink & {
   products: NavProduct[]
 }
 
@@ -80,6 +86,7 @@ export function mergeProduct(product: ERPProduct, content?: {
   const extraImages = extraAssets.map((image) => image.secureUrl)
   const images = extraImages.length ? extraImages : [content?.secureUrl, product.imageUrl].filter((url): url is string => Boolean(url))
   const details = String(content?.details || '').trim()
+  const sku = String(product.sku || product.barcode || '').trim()
   return {
     id,
     name,
@@ -89,8 +96,9 @@ export function mergeProduct(product: ERPProduct, content?: {
     categoryName: String(product.categoryName || 'Uncategorised'),
     price: Number(product.sellingPrice || 0),
     unit: product.unit || 'unit',
+    sku,
     stock,
-    inStock: true,
+    inStock: stock > 0,
     image: images[0] || null,
     images,
     imageAssets: extraAssets,
@@ -133,8 +141,29 @@ export function productImageSrc(product: Pick<CatalogProduct, 'image'>) {
   return product.image || PLACEHOLDER
 }
 
-export function productCode(product: Pick<CatalogProduct, 'id'>) {
+export function productCode(product: Pick<CatalogProduct, 'id' | 'sku'>) {
+  const sku = String(product.sku || '').trim()
+  if (sku) return sku
   return `TRM-${String(product.id).slice(-6).toUpperCase()}`
+}
+
+export function productMatchesQuery(
+  product: {
+    name: string
+    categoryName?: string
+    description?: string
+    sku?: string
+    manufacturer?: string
+  },
+  query: string,
+) {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  return [product.name, product.categoryName, product.description, product.sku, product.manufacturer]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+    .includes(q)
 }
 
 export function productBrand(product: Pick<CatalogProduct, 'manufacturer'>) {
@@ -161,9 +190,9 @@ export function productSpecs(product: CatalogProduct) {
   const specs: Array<{ label: string; value: string }> = []
   if (brand) specs.push({ label: 'Brand', value: brand })
   specs.push(
-    { label: 'Product code', value: productCode(product) },
+    { label: 'SKU', value: productCode(product) },
     { label: 'Packaging', value: product.unit || 'unit' },
-    { label: 'Availability', value: product.inStock ? 'In stock' : 'On request' },
+    { label: 'Availability', value: product.inStock ? 'In stock' : 'Available on request' },
   )
   return specs
 }

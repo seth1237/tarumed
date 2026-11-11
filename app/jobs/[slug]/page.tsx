@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { PageShell } from '@/components/page-shell'
 import { getJobBySlug } from '@/lib/mongodb'
 import { COMPANY } from '@/lib/utils'
 
@@ -25,9 +24,8 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
   const apply = `mailto:${job.applyEmail || COMPANY.careersEmail}?subject=${encodeURIComponent(`Application: ${job.title}`)}`
 
   return (
-    <main className="min-h-screen">
-      <SiteHeader />
-      <section className="shell section job-detail">
+    <PageShell>
+      <section className="home-block job-detail">
         <Link href="/jobs" className="text-link">← All roles</Link>
         {job.image && (
           <div className="job-hero">
@@ -50,7 +48,6 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
         )}
         <a href={apply} className="button button-primary">Apply</a>
       </section>
-      <SiteFooter />
-    </main>
+    </PageShell>
   )
 }

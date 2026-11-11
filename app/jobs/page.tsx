@@ -1,20 +1,25 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { PageShell } from '@/components/page-shell'
 import { jobHref } from '@/lib/jobs'
 import { listJobs } from '@/lib/mongodb'
+import { COMPANY } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: `Careers | ${COMPANY.shortName}`,
+  description: 'Join a team helping healthcare professionals do their best work.',
+}
 
 export default async function Jobs() {
   const jobs = await listJobs(true).catch(() => [])
 
   return (
-    <main className="min-h-screen">
-      <SiteHeader />
-      <section className="shell section">
-        <span className="kicker">Make an impact</span>
-        <h1 className="page-title">Open <em>roles.</em></h1>
+    <PageShell>
+      <section className="home-block page-intro">
+        <span className="kicker">Careers</span>
+        <h1 className="page-title">Open roles</h1>
         <p className="hero-lede">Join a team helping healthcare professionals do their best work.</p>
         {jobs.length === 0 && <p className="empty-state">No open roles right now.</p>}
         <div className="job-grid">
@@ -32,7 +37,6 @@ export default async function Jobs() {
           ))}
         </div>
       </section>
-      <SiteFooter />
-    </main>
+    </PageShell>
   )
 }

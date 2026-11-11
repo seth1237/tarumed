@@ -8,6 +8,15 @@ export async function SiteHeader() {
     name: product.name,
     slug: product.slug,
     categoryName: product.categoryName,
+    sku: product.sku,
+    manufacturer: product.manufacturer,
   }))
-  return <SiteHeaderNav products={products} />
+  const categories = catalog.categories
+    .filter((category) => category.count > 0)
+    .map((category) => ({
+      id: category._id,
+      name: category.name,
+      count: category.count,
+    }))
+  return <SiteHeaderNav products={products} categories={categories} />
 }

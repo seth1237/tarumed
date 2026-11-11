@@ -1,8 +1,10 @@
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, Headset, Package, ShieldCheck, Truck, Wrench } from 'lucide-react'
 import { DivisionIconMark } from '@/components/division-icon'
-import { ABOUT_INTRO, SERVICES, WHY_TARUMED } from '@/lib/brand'
+import { ABOUT_INTRO, WHY_TARUMED } from '@/lib/brand'
 import { divisionCoverSrc, divisionHref, type StoreDivision } from '@/lib/divisions'
+
+const WHY_ICONS = [ShieldCheck, Package, Headset, Wrench, Truck]
 
 export function DivisionsSection({ divisions }: { divisions: StoreDivision[] }) {
   return (
@@ -45,45 +47,30 @@ export function DivisionsSection({ divisions }: { divisions: StoreDivision[] }) 
 export function WhySection() {
   return (
     <section className="home-block" id="why-tarumed">
-      <div className="section-heading">
+      <div className="section-heading" data-reveal>
         <div>
           <span className="kicker">Why Tarumed?</span>
-          <h2>A partner, not only a catalogue</h2>
+          <h2>We are partners</h2>
         </div>
       </div>
       <div className="why-grid">
-        {WHY_TARUMED.map((item) => (
-          <article className="info-card" key={item.title}>
-            <CheckCircle2 className="info-card-icon" size={22} />
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-export function ServicesTeaser() {
-  return (
-    <section className="home-block" id="services">
-      <div className="section-heading">
-        <div>
-          <span className="kicker">Our services</span>
-          <h2>More than products</h2>
-          <p className="section-lede">Supply is only the start. Tarumed also installs, trains, supports and delivers.</p>
-        </div>
-        <Link href="/services" className="text-link">
-          All services <ArrowRight size={16} />
-        </Link>
-      </div>
-      <div className="service-grid">
-        {SERVICES.map((item) => (
-          <article className="info-card" key={item.slug}>
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
-          </article>
-        ))}
+        {WHY_TARUMED.map((item, index) => {
+          const Icon = WHY_ICONS[index] || ShieldCheck
+          return (
+            <article
+              className="info-card why-tile"
+              key={item.title}
+              data-reveal
+              data-reveal-delay={String(index * 70)}
+            >
+              <span className="info-card-icon" aria-hidden="true">
+                <Icon size={20} strokeWidth={2.1} />
+              </span>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          )
+        })}
       </div>
     </section>
   )
@@ -91,7 +78,7 @@ export function ServicesTeaser() {
 
 export function AboutTeaser() {
   return (
-    <section className="home-block about-teaser" id="about">
+    <section className="home-block about-teaser" id="about" data-reveal>
       <div>
         <span className="kicker">About Tarumed</span>
         <h2>Healthcare supply from Eldoret</h2>

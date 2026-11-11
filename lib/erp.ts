@@ -12,6 +12,8 @@ export type ERPProduct = {
   isActive?: boolean
   currentQuantity?: number
   manufacturer?: string
+  sku?: string
+  barcode?: string
 }
 
 export type ERPCategory = {
