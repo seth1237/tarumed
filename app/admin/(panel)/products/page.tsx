@@ -8,7 +8,7 @@ export default async function AdminProductsPage() {
       products={catalog.products}
       categories={catalog.categories}
       title="Products"
-      subtitle="Filter by category, then open a product to edit details and photos."
+      subtitle="Filter by photo status or category, then drop photos onto a product or open it to edit details."
     />
   )
 }
