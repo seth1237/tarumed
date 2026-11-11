@@ -28,6 +28,17 @@ const nextConfig = {
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
         ],
       },
+      {
+        source: '/api/:path*',
+        has: [{ type: 'header', key: 'origin', value: 'https://tarumed-three.vercel.app' }],
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: 'https://tarumed-three.vercel.app' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, PATCH, DELETE, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Org-Id' },
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Vary', value: 'Origin' },
+        ],
+      },
     ]
   },
 }

@@ -598,16 +598,32 @@ footer { background: #061018; color: #dce9e8; padding: 1rem; margin-top: auto; }
 .systems-by {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
   height: auto;
-  padding: .75rem 1rem;
-  border-radius: 6px;
-  background: var(--teal);
-  color: #041614;
-  font-size: .75rem;
+  padding: 4px 12px 4px 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .08);
+  color: #e8f4f2;
+  font-size: 12px;
   font-weight: 700;
 }
-.systems-by:hover { background: #2cc4bb; color: #041614; }
+.systems-by-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.systems-by-mark img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+}
+.systems-by:hover { background: rgba(255, 255, 255, .14); color: #fff; }
 
 .home-hero {
   position: relative;

@@ -40,7 +40,11 @@ export function SiteFooter() {
           href={COMPANY.builderUrl}
           target="_blank"
           rel="noopener noreferrer"
+          aria-label={`${COMPANY.builderName} at ${COMPANY.builderLabel}`}
         >
+          <span className="systems-by-mark">
+            <img src={COMPANY.builderLogo} alt="" />
+          </span>
           {COMPANY.builderLabel}
         </a>
       </div>

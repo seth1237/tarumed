@@ -1,22 +1,29 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { corsHeaders, corsOrigin } from '@/lib/cors'
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  if (pathname === '/admin/login' || pathname.startsWith('/api/auth/')) return NextResponse.next()
-  if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
-    const session = request.cookies.get('tarumed_admin')?.value
-    if (!session) {
-      if (pathname.startsWith('/api/')) {
-        return NextResponse.json({ success: false, message: 'Sign in required' }, { status: 401 })
+  const origin = corsOrigin(request.headers.get('origin'))
+
+  if (request.method === 'OPTIONS') {
+    const response = new NextResponse(null, { status: 204 })
+    if (origin) {
+      for (const [key, value] of Object.entries(corsHeaders(origin))) {
+        response.headers.set(key, value)
       }
-      const login = new URL('/admin/login', request.url)
-      return NextResponse.redirect(login)
+    }
+    return response
+  }
+
+  const response = NextResponse.next()
+  if (origin) {
+    for (const [key, value] of Object.entries(corsHeaders(origin))) {
+      response.headers.set(key, value)
     }
   }
-  return NextResponse.next()
+  return response
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*', '/api/admin/:path*'],
+  matcher: '/api/:path*',
 }
