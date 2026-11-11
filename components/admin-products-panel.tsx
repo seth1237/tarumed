@@ -329,10 +329,25 @@ export function AdminProductsPanel({
                   </button>
                   {open && (
                     <div className="admin-editor">
+                      <label>
+                        Product name
+                        <input
+                          readOnly
+                          value={product.name}
+                          onFocus={(event) => event.currentTarget.select()}
+                        />
+                      </label>
                       <dl className="admin-product-facts">
                         <div>
                           <dt>SKU</dt>
-                          <dd>{sku}</dd>
+                          <dd>
+                            <input
+                              readOnly
+                              value={sku}
+                              aria-label="SKU"
+                              onFocus={(event) => event.currentTarget.select()}
+                            />
+                          </dd>
                         </div>
                         <div>
                           <dt>Stock</dt>
